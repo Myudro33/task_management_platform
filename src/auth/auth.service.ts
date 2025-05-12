@@ -27,6 +27,7 @@ export class AuthService {
     try {
       const user = await this.prisma.users.findUnique({
         where: { email: data.email },
+        include: { roles: true },
       });
       if (!user) {
         return { message: 'User not found' };
@@ -38,7 +39,10 @@ export class AuthService {
       if (!isPasswordValid) {
         return { message: 'Invalid password' };
       }
-      const token = this.jwtService.sign({ id: user.id });
+      const token = this.jwtService.sign({
+        id: user.id,
+        role: user.roles.name,
+      });
       return { message: 'Login successful', token };
     } catch (error) {
       return error;

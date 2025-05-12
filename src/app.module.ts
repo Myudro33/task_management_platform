@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -20,7 +25,10 @@ export class AppModule implements NestModule {
       .forRoutes('/api/auth/register', '/api/users');
     consumer
       .apply(AuthMiddleware, AdminMiddleware)
-      .forRoutes('/api/tasks', 'POST');
+      .forRoutes({ path: '/api/tasks', method: RequestMethod.POST });
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: '/api/tasks', method: RequestMethod.GET });
     consumer.apply(AuthMiddleware).forRoutes('/api/tasks/:id/comments');
   }
 }

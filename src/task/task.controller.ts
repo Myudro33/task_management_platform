@@ -22,8 +22,8 @@ export class TaskController {
   }
 
   @Get()
-  findAll() {
-    return this.taskService.findAll();
+  findAll(@Req() req: any) {
+    return this.taskService.findAll(req.user);
   }
 
   @Put(':id')

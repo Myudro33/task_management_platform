@@ -16,29 +16,33 @@ export class TaskService {
     }
   }
 
-  findAll() {
+  findAll(user: { id: number; role: string }) {
     try {
-      return this.prisma.tasks.findMany({
-        include: {
-          comments: true,
-          files: true,
-          status: true,
-          asignee: {
-            select: {
-              name: true,
-              email: true,
-              avatar: true,
+      if (user.role == 'admin') {
+        return this.prisma.tasks.findMany({
+          include: {
+            comments: true,
+            files: true,
+            status: true,
+            asignee: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+            createdBy: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
             },
           },
-          createdBy: {
-            select: {
-              name: true,
-              email: true,
-              avatar: true,
-            },
-          },
-        },
-      });
+        });
+      } else {
+        return this.prisma.tasks.findMany({ where: { asigneeId: user.id } });
+      }
     } catch (error) {
       return error;
     }

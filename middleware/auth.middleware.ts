@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 
 interface User {
   id: number;
+  role: string;
 }
 
 declare module 'express' {
@@ -29,8 +30,6 @@ export class AuthMiddleware implements NestMiddleware {
       if (err) {
         return res.status(401).json({ message: 'unauthorized' });
       }
-      console.log(decoded);
-
       req.user = decoded as User;
       next();
     });
@@ -39,7 +38,7 @@ export class AuthMiddleware implements NestMiddleware {
 
 export class AdminMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    if (req?.user?.id !== 1) {
+    if (req?.user?.role !== 'admin') {
       return res
         .status(403)
         .json({ message: 'only admin can access this route' });
