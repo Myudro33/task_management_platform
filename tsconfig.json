@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "commonjs",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES6",
+    "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -16,9 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
-    "strict": true
-  },"include": [
-    "prisma/seed.js"
-  ]
+    "noFallthroughCasesInSwitch": false
+  }
 }
