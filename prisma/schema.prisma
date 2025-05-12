@@ -24,13 +24,13 @@ model files {
 }
 
 model comments {
-  id        Int      @id @unique @default(autoincrement())
+  id        Int    @id @unique @default(autoincrement())
   taskId    Int
   userId    Int
-  task      tasks    @relation(fields: [taskId], references: [id])
-  user      users    @relation(fields: [userId], references: [id])
-  content   String   @db.VarChar(255)
-  createdAt DateTime @default(now())
+  task      tasks  @relation(fields: [taskId], references: [id])
+  user      users  @relation(fields: [userId], references: [id])
+  content   String @db.VarChar(255)
+  createdAt String @db.VarChar(255)
 }
 
 model tasks {
