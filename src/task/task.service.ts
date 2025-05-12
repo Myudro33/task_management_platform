@@ -7,39 +7,65 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class TaskService {
   constructor(private readonly prisma: PrismaService) {}
   create(data: CreateTaskDto) {
-    return this.prisma.tasks.create({
-      data,
-    });
+    try {
+      return this.prisma.tasks.create({
+        data,
+      });
+    } catch (error) {
+      return error;
+    }
   }
 
   findAll() {
-    return this.prisma.tasks.findMany({
-      include: {
-        comments: true,
-        files: true,
-        status: true,
-        asignee: {
-          select: {
-            name: true,
-            email: true,
-            avatar: true,
+    try {
+      return this.prisma.tasks.findMany({
+        include: {
+          comments: true,
+          files: true,
+          status: true,
+          asignee: {
+            select: {
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
+          createdBy: {
+            select: {
+              name: true,
+              email: true,
+              avatar: true,
+            },
           },
         },
-        createdBy: {
-          select: {
-            name: true,
-            email: true,
-            avatar: true,
-          },
-        },
-      },
-    });
+      });
+    } catch (error) {
+      return error;
+    }
   }
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  async update(id: number, data: UpdateTaskDto) {
+    try {
+      const task = await this.prisma.tasks.findUnique({ where: { id } });
+      if (!task) {
+        return { message: 'task not found' };
+      }
+      await this.prisma.tasks.update({ where: { id }, data });
+      return { message: 'tasks updated' };
+    } catch (error) {
+      return error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(id: number) {
+    try {
+      const task = await this.prisma.tasks.findUnique({ where: { id: id } });
+      if (!task) {
+        return { message: 'task not found' };
+      }
+      await this.prisma.tasks.delete({ where: { id } });
+      return { message: 'tasks deleted' };
+    } catch (error) {
+      return error;
+    }
   }
 }
