@@ -6,10 +6,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class TaskService {
   constructor(private readonly prisma: PrismaService) {}
-  create(data: CreateTaskDto) {
+  create(data: CreateTaskDto, userId: number) {
     try {
       return this.prisma.tasks.create({
-        data,
+        data: { ...data, createdById: userId },
       });
     } catch (error) {
       return error;

@@ -18,6 +18,9 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware, AdminMiddleware)
       .forRoutes('/api/auth/register', '/api/users');
+    consumer
+      .apply(AuthMiddleware, AdminMiddleware)
+      .forRoutes('/api/tasks', 'POST');
     consumer.apply(AuthMiddleware).forRoutes('/api/tasks/:id/comments');
   }
 }

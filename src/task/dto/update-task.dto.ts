@@ -21,7 +21,4 @@ export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsNumber()
   @IsOptional()
   asigneeId: number;
-  @IsNumber()
-  @IsOptional()
-  createdById: number;
 }

@@ -25,7 +25,4 @@ export class CreateTaskDto {
   @IsNumber()
   @IsNotEmpty()
   asigneeId: number;
-  @IsNumber()
-  @IsNotEmpty()
-  createdById: number;
 }
