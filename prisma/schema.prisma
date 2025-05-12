@@ -18,7 +18,7 @@ model users {
   name       String? @db.VarChar(255)
   email      String  @unique @db.VarChar(255)
   password   String  @db.VarChar(255)
-  roleId     Int     @default(autoincrement())
+  roleId     Int     
   roles      roles   @relation(fields: [roleId], references: [id])
   department String? @db.VarChar(255)
   avatar     String? @db.VarChar(255)
