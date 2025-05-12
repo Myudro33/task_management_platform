@@ -7,6 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model statuses {
+  id    Int     @id @unique @default(autoincrement())
+  name  String  @db.VarChar(255)
+  tasks tasks[]
+}
+
+model files {
+  id         Int    @id @unique @default(autoincrement())
+  taskId     Int
+  task       tasks  @relation(fields: [taskId], references: [id])
+  filename   String @db.VarChar(255)
+  url        String @db.VarChar(255)
+  uploadById Int
+  uploadBy   users  @relation(fields: [uploadById], references: [id])
+}
+
+model comments {
+  id        Int      @id @unique @default(autoincrement())
+  taskId    Int
+  userId    Int
+  task      tasks    @relation(fields: [taskId], references: [id])
+  user      users    @relation(fields: [userId], references: [id])
+  content   String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+}
+
+model tasks {
+  id          Int        @id @unique @default(autoincrement())
+  title       String     @db.VarChar(255)
+  description String?    @db.VarChar(255)
+  dueDate     String     @db.VarChar(255)
+  statusId    Int
+  status      statuses   @relation(fields: [statusId], references: [id])
+  asigneeId   Int
+  createdById Int
+  asignee     users      @relation("TasksAsignee", fields: [asigneeId], references: [id])
+  createdBy   users      @relation("TasksCreator", fields: [createdById], references: [id])
+  files       files[]
+  comments    comments[]
+}
+
 model roles {
   id    Int     @id @unique @default(autoincrement())
   name  String  @db.VarChar(255)
@@ -14,12 +55,16 @@ model roles {
 }
 
 model users {
-  id         Int     @id @unique @default(autoincrement())
-  name       String? @db.VarChar(255)
-  email      String  @unique @db.VarChar(255)
-  password   String  @db.VarChar(255)
-  roleId     Int     
-  roles      roles   @relation(fields: [roleId], references: [id])
-  department String? @db.VarChar(255)
-  avatar     String? @db.VarChar(255)
+  id           Int        @id @unique @default(autoincrement())
+  name         String?    @db.VarChar(255)
+  email        String     @unique @db.VarChar(255)
+  password     String     @db.VarChar(255)
+  roleId       Int
+  roles        roles      @relation(fields: [roleId], references: [id])
+  department   String?    @db.VarChar(255)
+  avatar       String?    @db.VarChar(255)
+  tasksAsignee tasks[]    @relation("TasksAsignee")
+  tasksCreator tasks[]    @relation("TasksCreator")
+  files        files[]
+  comments     comments[]
 }
