@@ -16,7 +16,7 @@ export class CommentController {
   }
 
   @Get(':id/comments')
-  getPostComments() {
-    return this.commentService.getPostComments();
+  getPostComments(@Param('id') id: string) {
+    return this.commentService.getPostComments(+id);
   }
 }
