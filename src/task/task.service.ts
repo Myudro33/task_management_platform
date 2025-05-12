@@ -13,7 +13,27 @@ export class TaskService {
   }
 
   findAll() {
-    return `This action returns all task`;
+    return this.prisma.tasks.findMany({
+      include: {
+        comments: true,
+        files: true,
+        status: true,
+        asignee: {
+          select: {
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        createdBy: {
+          select: {
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+      },
+    });
   }
   update(id: number, updateTaskDto: UpdateTaskDto) {
     return `This action updates a #${id} task`;
