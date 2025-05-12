@@ -4,6 +4,13 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Seed roles
+  const statuses = await prisma.statuses.createMany({
+    data: [
+      { id: 1, name: 'pending' },
+      { id: 2, name: 'in_progress' },
+      { id: 3, name: 'done' },
+    ],
+  });
   const roles = await prisma.roles.createMany({
     data: [
       { id: 1, name: 'admin' },
