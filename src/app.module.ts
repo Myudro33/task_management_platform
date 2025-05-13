@@ -12,9 +12,17 @@ import { AuthModule } from './auth/auth.module';
 import { AdminMiddleware, AuthMiddleware } from 'middleware/auth.middleware';
 import { TaskModule } from './task/task.module';
 import { CommentModule } from './comment/comment.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule, TaskModule, CommentModule],
+  imports: [
+    PrismaModule,
+    UserModule,
+    AuthModule,
+    TaskModule,
+    CommentModule,
+    MailModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

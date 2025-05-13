@@ -2,17 +2,42 @@ import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly prisma: PrismaService) {}
-  create(data: CreateTaskDto, userId: number) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
+
+  async create(data: CreateTaskDto, userId: number) {
     try {
-      return this.prisma.tasks.create({
+      const { asigneeId } = data;
+      const user = await this.prisma.users.findUnique({
+        where: { id: asigneeId },
+      });
+
+      if (user && user.email) {
+        await this.mailService.sendMail(
+          user.email,
+          'Task assigned',
+          `<h1>You have been assigned to the task</h1>
+          <h2 style="color: #4CAF50; font-size: 20px; letter-spacing: 5px;">Task details: ${data.title}</h2>
+            <p>Task details: ${data.description ? data.description : "task doesn't have description"}</p>
+            <p>Deadline: ${data.dueDate}</p>`,
+        );
+      } else {
+        return { message: 'Asignee user not found or email is missing' };
+      }
+
+      const createdTask = await this.prisma.tasks.create({
         data: { ...data, createdById: userId },
       });
+
+      return createdTask;
     } catch (error) {
-      return error;
+      return { error: error.message || 'An error occurred' };
     }
   }
 
