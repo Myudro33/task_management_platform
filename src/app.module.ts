@@ -13,6 +13,7 @@ import { AdminMiddleware, AuthMiddleware } from 'middleware/auth.middleware';
 import { TaskModule } from './task/task.module';
 import { CommentModule } from './comment/comment.module';
 import { MailModule } from './mail/mail.module';
+import { UploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MailModule } from './mail/mail.module';
     TaskModule,
     CommentModule,
     MailModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
