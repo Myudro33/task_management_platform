@@ -1,10 +1,23 @@
-import { Controller, Get, Body, Param, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Param,
+  Put,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UploadService } from 'src/file-upload/file-upload.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/api/users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get()
   users() {
@@ -19,5 +32,21 @@ export class UserController {
   @Put(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
+  }
+  @Put(':id/upload-avatar')
+  @UseInterceptors(
+    FileInterceptor('avatar', new UploadService().getMulterOptions('avatars')),
+  )
+  async uploadAvatar(
+    @Param('id') id: string,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+    console.log('File uploaded:', avatar.path);
+
+    const avatarUrl = await this.userService.uploadAvatar(+id, avatar);
+    return {
+      message: 'Avatar uploaded successfully',
+      avatarUrl,
+    };
   }
 }
