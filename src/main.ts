@@ -9,6 +9,13 @@ import { AllExceptionsFilter } from './global-errors/all-exceptions.filter'; // 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   dotenv.config();
+  const corsOrigins = process.env.CORS_ORIGINS?.split(',').map((origin) =>
+    origin.trim(),
+  );
+  app.enableCors({
+    origin: corsOrigins,
+    credentials: true,
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useStaticAssets(join(process.cwd(), 'uploads'), {

@@ -36,13 +36,11 @@ export class AppModule implements NestModule {
       { path: '/api/tasks', method: RequestMethod.POST },
       { path: '/api/tasks:id', method: RequestMethod.DELETE },
     ];
-
     const authOnlyRoutes = [
       '/api/tasks/:id/files',
       { path: '/api/tasks', method: RequestMethod.GET },
       '/api/tasks/:id/comments',
     ];
-
     consumer
       .apply(AuthMiddleware, AdminMiddleware)
       .forRoutes(...authAndAdminRoutes);
