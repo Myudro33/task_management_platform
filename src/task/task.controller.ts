@@ -19,7 +19,10 @@ import { UploadService } from 'src/file-upload/file-upload.service';
 @Controller('/api/tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
-
+  @Get(':id/files')
+  async getFiles(@Param('id') id: string) {
+    return this.taskService.getFiles(+id);
+  }
   @Post(':id/files')
   @UseInterceptors(
     FileInterceptor(

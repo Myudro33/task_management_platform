@@ -12,7 +12,20 @@ export class TaskService {
     private readonly mailService: MailService,
     private readonly uploadService: UploadService,
   ) {}
-
+  async getFiles(id: number) {
+    try {
+      const task = await this.prisma.tasks.findUnique({ where: { id } });
+      if (!task) {
+        return { message: 'task not found' };
+      }
+      const files = await this.prisma.files.findMany({
+        where: { taskId: id },
+      });
+      return files;
+    } catch (error) {
+      return error;
+    }
+  }
   async uploadFile(id: number, file, userId: number) {
     try {
       const task = await this.prisma.tasks.findUnique({ where: { id } });
