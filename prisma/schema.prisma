@@ -19,8 +19,8 @@ model files {
   task       tasks  @relation(fields: [taskId], references: [id])
   filename   String @db.VarChar(255)
   url        String @db.VarChar(255)
-  uploadById Int
-  uploadBy   users  @relation(fields: [uploadById], references: [id])
+  uploadBy Int
+  uploadedBy   users  @relation(fields: [uploadBy], references: [id])
 }
 
 model comments {
