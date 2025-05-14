@@ -101,7 +101,28 @@ export class TaskService {
           },
         });
       } else {
-        return this.prisma.tasks.findMany({ where: { asigneeId: user.id } });
+        return this.prisma.tasks.findMany({
+          where: { asigneeId: user.id },
+          include: {
+            comments: true,
+            files: true,
+            status: true,
+            asignee: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+            createdBy: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        });
       }
     } catch (error) {
       return error;

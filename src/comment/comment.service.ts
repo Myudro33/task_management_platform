@@ -5,8 +5,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class CommentService {
   constructor(private readonly prisma: PrismaService) {}
-  create(id: number, data: CreateCommentDto, userId: number) {
+  async create(id: number, data: CreateCommentDto, userId: number) {
     try {
+      const task = await this.prisma.tasks.findUnique({ where: { id } });
+      if (!task) {
+        return { message: 'Task not found' };
+      }
       return this.prisma.comments.create({
         data: { ...data, taskId: id, userId },
       });
