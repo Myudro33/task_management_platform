@@ -30,16 +30,22 @@ import { UploadModule } from './file-upload/file-upload.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    const authAndAdminRoutes = [
+      '/api/auth/register',
+      '/api/users',
+      { path: '/api/tasks', method: RequestMethod.POST },
+      { path: '/api/tasks:id', method: RequestMethod.DELETE },
+    ];
+
+    const authOnlyRoutes = [
+      '/api/tasks/:id/files',
+      { path: '/api/tasks', method: RequestMethod.GET },
+      '/api/tasks/:id/comments',
+    ];
+
     consumer
       .apply(AuthMiddleware, AdminMiddleware)
-      .forRoutes('/api/auth/register', '/api/users');
-    consumer
-      .apply(AuthMiddleware, AdminMiddleware)
-      .forRoutes({ path: '/api/tasks', method: RequestMethod.POST });
-    consumer.apply(AuthMiddleware).forRoutes('/api/tasks/:id/files');
-    consumer
-      .apply(AuthMiddleware)
-      .forRoutes({ path: '/api/tasks', method: RequestMethod.GET });
-    consumer.apply(AuthMiddleware).forRoutes('/api/tasks/:id/comments');
+      .forRoutes(...authAndAdminRoutes);
+    consumer.apply(AuthMiddleware).forRoutes(...authOnlyRoutes);
   }
 }
