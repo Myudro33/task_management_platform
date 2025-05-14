@@ -20,14 +20,14 @@ import { UploadService } from 'src/file-upload/file-upload.service';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  @Post(':id/upload')
+  @Post(':id/files')
   @UseInterceptors(
     FileInterceptor(
       'file',
       new UploadService().getMulterOptions('files', 'file'),
     ),
   )
-  @Post(':id/upload')
+  @Post(':id/files')
   async uploadFile(
     @Param('id')
     id: string,
