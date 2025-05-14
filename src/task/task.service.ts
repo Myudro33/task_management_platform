@@ -38,7 +38,7 @@ export class TaskService {
           url: fileUrl,
           filename: file.filename,
           taskId: id,
-          uploadBy: userId,
+          uploadedBy: userId,
         },
       });
       return { message: 'file uploaded', fileUrl };
