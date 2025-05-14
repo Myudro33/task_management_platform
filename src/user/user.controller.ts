@@ -28,26 +28,19 @@ export class UserController {
   profile(@Param('id') id: string) {
     return this.userService.profile(+id);
   }
-
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-  @Put(':id/upload-avatar')
   @UseInterceptors(
     FileInterceptor(
       'avatar',
       new UploadService().getMulterOptions('avatars', 'image'),
     ),
   )
-  async uploadAvatar(
+  @Put(':id')
+  update(
     @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() avatar: Express.Multer.File,
   ) {
-    const avatarUrl = await this.userService.uploadAvatar(+id, avatar);
-    return {
-      message: 'Avatar uploaded successfully',
-      avatarUrl,
-    };
+    return this.userService.update(+id, updateUserDto, avatar);
   }
 }

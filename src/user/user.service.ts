@@ -8,6 +8,7 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly uploadService: UploadService,
   ) {}
+
   getUsers() {
     return this.prisma.users.findMany();
   }
@@ -20,21 +21,27 @@ export class UserService {
     });
   }
 
-  update(id: number, data: UpdateUserDto) {
+  async update(id: number, data: UpdateUserDto, avatar?: Express.Multer.File) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: id },
+    });
+    if (!user) {
+      return { message: 'User not found' };
+    }
+
+    let avatarUrl: string | undefined;
+    console.log(data);
+
+    if (avatar) {
+      console.log('test');
+
+      avatarUrl = this.uploadService.getPublicUrl(avatar.filename, 'avatars');
+      data.avatar = avatarUrl;
+    }
+
     return this.prisma.users.update({
       where: { id: id },
       data,
     });
-  }
-  async uploadAvatar(userId: number, avatar: Express.Multer.File) {
-    const avatarUrl = this.uploadService.getPublicUrl(
-      avatar.filename,
-      'avatars',
-    );
-    await this.prisma.users.update({
-      where: { id: userId },
-      data: { avatar: avatarUrl },
-    });
-    return avatarUrl;
   }
 }
