@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { AppError } from 'src/app-error/app-error.module';
 
 @Injectable()
 export class MailService {
@@ -33,7 +34,7 @@ export class MailService {
       return info;
     } catch (error) {
       console.error('Error sending email: ', error);
-      throw error;
+      throw new AppError(error.message, 500);
     }
   }
 }

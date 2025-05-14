@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/register-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { AppError } from 'src/app-error/app-error.module';
 
 @Injectable()
 export class AuthService {
@@ -19,14 +20,14 @@ export class AuthService {
         where: { email: data.email },
       });
       if (existingUser) {
-        return { message: 'User already exists' };
+        throw new AppError('User already exists', 404);
       }
       const user = await this.prisma.users.create({
         data: { ...data, password: hashedPassword },
       });
       return { message: 'User created successfully', data: user };
     } catch (error) {
-      return error;
+      throw new AppError(error.message, 500);
     }
   }
   async login(data: LoginAuthDto) {
@@ -43,7 +44,7 @@ export class AuthService {
         user.password,
       );
       if (!isPasswordValid) {
-        return { message: 'Invalid password' };
+        throw new AppError('Invalid password', HttpStatus.UNAUTHORIZED);
       }
       const token = this.jwtService.sign({
         id: user.id,
@@ -51,7 +52,7 @@ export class AuthService {
       });
       return { message: 'Login successful', token };
     } catch (error) {
-      return error;
+      throw new AppError(error.message, 500);
     }
   }
 }

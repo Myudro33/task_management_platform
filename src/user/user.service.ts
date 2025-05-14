@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UploadService } from 'src/file-upload/file-upload.service';
+import { AppError } from 'src/app-error/app-error.module';
 @Injectable()
 export class UserService {
   constructor(
@@ -9,39 +10,54 @@ export class UserService {
     private readonly uploadService: UploadService,
   ) {}
 
-  getUsers() {
-    return this.prisma.users.findMany();
+  async getUsers() {
+    try {
+      const users = await this.prisma.users.findMany();
+      if (!users) {
+        throw new AppError('No users found', HttpStatus.NOT_FOUND);
+      }
+      return users;
+    } catch (error) {
+      throw new AppError(error.message, 500);
+    }
   }
 
-  profile(id: number) {
-    return this.prisma.users.findUnique({
-      where: {
-        id: id,
-      },
-    });
+  async profile(id: number) {
+    try {
+      const user = await this.prisma.users.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!user) {
+        throw new AppError('User not found', HttpStatus.NOT_FOUND);
+      }
+      return user;
+    } catch (error) {
+      throw new AppError(error.message, 500);
+    }
   }
 
   async update(id: number, data: UpdateUserDto, avatar?: Express.Multer.File) {
-    const user = await this.prisma.users.findUnique({
-      where: { id: id },
-    });
-    if (!user) {
-      return { message: 'User not found' };
+    try {
+      const user = await this.prisma.users.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new AppError('User not found', HttpStatus.NOT_FOUND);
+      }
+      let avatarUrl: string | undefined;
+      if (avatar) {
+        avatarUrl = this.uploadService.getPublicUrl(avatar.filename, 'avatars');
+        data.avatar = avatarUrl;
+      }
+
+      return this.prisma.users.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      throw new AppError(error.message, 500);
     }
-
-    let avatarUrl: string | undefined;
-    console.log(data);
-
-    if (avatar) {
-      console.log('test');
-
-      avatarUrl = this.uploadService.getPublicUrl(avatar.filename, 'avatars');
-      data.avatar = avatarUrl;
-    }
-
-    return this.prisma.users.update({
-      where: { id: id },
-      data,
-    });
   }
 }

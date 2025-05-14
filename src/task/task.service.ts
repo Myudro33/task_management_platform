@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
 import { UploadService } from 'src/file-upload/file-upload.service';
+import { AppError } from 'src/app-error/app-error.module';
 
 @Injectable()
 export class TaskService {
@@ -16,21 +17,21 @@ export class TaskService {
     try {
       const task = await this.prisma.tasks.findUnique({ where: { id } });
       if (!task) {
-        return { message: 'task not found' };
+        throw new AppError('Task not found', HttpStatus.NOT_FOUND);
       }
       const files = await this.prisma.files.findMany({
         where: { taskId: id },
       });
       return files;
     } catch (error) {
-      return error;
+      throw new AppError(error.message, 500);
     }
   }
   async uploadFile(id: number, file, userId: number) {
     try {
       const task = await this.prisma.tasks.findUnique({ where: { id } });
       if (!task) {
-        return { message: 'task not found' };
+        throw new AppError('Task not found', HttpStatus.NOT_FOUND);
       }
       const fileUrl = this.uploadService.getPublicUrl(file.filename, 'files');
       await this.prisma.files.create({
@@ -43,7 +44,7 @@ export class TaskService {
       });
       return { message: 'file uploaded', fileUrl };
     } catch (error) {
-      return error;
+      throw new AppError(error.message, 500);
     }
   }
   async create(data: CreateTaskDto, userId: number) {
@@ -63,7 +64,7 @@ export class TaskService {
             <p>Deadline: ${data.dueDate}</p>`,
         );
       } else {
-        return { message: 'Asignee user not found or email is missing' };
+        throw new AppError('Asignee user not found', HttpStatus.NOT_FOUND);
       }
 
       const createdTask = await this.prisma.tasks.create({
@@ -72,7 +73,7 @@ export class TaskService {
 
       return createdTask;
     } catch (error) {
-      return { error: error.message || 'An error occurred' };
+      throw new AppError(error.message, error.status);
     }
   }
 
@@ -125,19 +126,19 @@ export class TaskService {
         });
       }
     } catch (error) {
-      return error;
+      throw new AppError(error, error.status);
     }
   }
   async update(id: number, data: UpdateTaskDto) {
     try {
       const task = await this.prisma.tasks.findUnique({ where: { id } });
       if (!task) {
-        return { message: 'task not found' };
+        throw new AppError('Task not found', HttpStatus.NOT_FOUND);
       }
       await this.prisma.tasks.update({ where: { id }, data });
       return { message: 'tasks updated' };
     } catch (error) {
-      return error;
+      throw new AppError(error.message, error.status);
     }
   }
 
@@ -145,12 +146,12 @@ export class TaskService {
     try {
       const task = await this.prisma.tasks.findUnique({ where: { id: id } });
       if (!task) {
-        return { message: 'task not found' };
+        throw new AppError('Task not found', HttpStatus.NOT_FOUND);
       }
       await this.prisma.tasks.delete({ where: { id } });
       return { message: 'tasks deleted' };
     } catch (error) {
-      return error;
+      throw new AppError(error.message, error.status);
     }
   }
 }
