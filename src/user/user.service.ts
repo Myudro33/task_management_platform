@@ -27,8 +27,6 @@ export class UserService {
     });
   }
   async uploadAvatar(userId: number, avatar: Express.Multer.File) {
-    console.log(avatar);
-
     const avatarUrl = this.uploadService.getPublicUrl(
       avatar.filename,
       'avatars',

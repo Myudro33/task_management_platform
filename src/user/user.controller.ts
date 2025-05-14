@@ -35,14 +35,15 @@ export class UserController {
   }
   @Put(':id/upload-avatar')
   @UseInterceptors(
-    FileInterceptor('avatar', new UploadService().getMulterOptions('avatars')),
+    FileInterceptor(
+      'avatar',
+      new UploadService().getMulterOptions('avatars', 'image'),
+    ),
   )
   async uploadAvatar(
     @Param('id') id: string,
     @UploadedFile() avatar: Express.Multer.File,
   ) {
-    console.log('File uploaded:', avatar.path);
-
     const avatarUrl = await this.userService.uploadAvatar(+id, avatar);
     return {
       message: 'Avatar uploaded successfully',

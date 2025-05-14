@@ -36,6 +36,7 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware, AdminMiddleware)
       .forRoutes({ path: '/api/tasks', method: RequestMethod.POST });
+    consumer.apply(AuthMiddleware).forRoutes('/api/tasks/:id/upload');
     consumer
       .apply(AuthMiddleware)
       .forRoutes({ path: '/api/tasks', method: RequestMethod.GET });

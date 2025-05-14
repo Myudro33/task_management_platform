@@ -3,14 +3,36 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
+import { UploadService } from 'src/file-upload/file-upload.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
+    private readonly uploadService: UploadService,
   ) {}
 
+  async uploadFile(id: number, file, userId: number) {
+    try {
+      const task = await this.prisma.tasks.findUnique({ where: { id } });
+      if (!task) {
+        return { message: 'task not found' };
+      }
+      const fileUrl = this.uploadService.getPublicUrl(file.filename, 'files');
+      await this.prisma.files.create({
+        data: {
+          url: fileUrl,
+          filename: file.filename,
+          taskId: id,
+          uploadBy: userId,
+        },
+      });
+      return { message: 'file uploaded', fileUrl };
+    } catch (error) {
+      return error;
+    }
+  }
   async create(data: CreateTaskDto, userId: number) {
     try {
       const { asigneeId } = data;
