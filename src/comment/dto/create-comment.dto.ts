@@ -1,12 +1,8 @@
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 export class CreateCommentDto {
+  @ApiProperty({ example: 'comment for task' })
   @IsString()
   @IsNotEmpty()
   content: string;
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^\d{2}\/\d{2}\/\d{4}$/, {
-    message: 'createdAt must be in the format DD/MM/YYYY',
-  })
-  createdAt: string;
 }

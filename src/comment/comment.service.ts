@@ -13,7 +13,15 @@ export class CommentService {
         throw new AppError('Task not found', HttpStatus.NOT_FOUND);
       }
       return this.prisma.comments.create({
-        data: { ...data, taskId: id, userId },
+        data: {
+          ...data,
+          createdAt: new Date()
+            .toISOString()
+            .replace('T', ' ')
+            .replace('Z', ''),
+          taskId: id,
+          userId,
+        },
       });
     } catch (error) {
       throw new AppError(error.message, 500);
