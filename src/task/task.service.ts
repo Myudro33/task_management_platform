@@ -3,7 +3,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
-import { UploadService } from 'src/file-upload/file-upload.service';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { AppError } from 'src/app-error/app-error.module';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class TaskService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
-    private readonly uploadService: UploadService,
+    private readonly FileUploadService: FileUploadService,
   ) {}
   async getFiles(id: number) {
     try {
@@ -33,16 +33,25 @@ export class TaskService {
       if (!task) {
         throw new AppError('Task not found', HttpStatus.NOT_FOUND);
       }
-      const fileUrl = this.uploadService.getPublicUrl(file.filename, 'files');
-      await this.prisma.files.create({
-        data: {
-          url: fileUrl,
-          filename: file.filename,
-          taskId: id,
-          uploadedBy: userId,
-        },
-      });
-      return { message: 'file uploaded', fileUrl };
+      const files = Array.isArray(file) ? file : [file];
+      const uploadedFiles: any = [];
+      for (const f of files) {
+        const fileUrl = this.FileUploadService.getPublicUrl(
+          f.filename,
+          'files',
+        );
+        const file = await this.prisma.files.create({
+          data: {
+            filename: f.filename,
+            url: fileUrl,
+            taskId: id,
+            uploadedBy: userId,
+          },
+        });
+        uploadedFiles.push(file);
+      }
+
+      return { message: 'files uploaded', data: uploadedFiles };
     } catch (error) {
       throw new AppError(error.message, 500);
     }

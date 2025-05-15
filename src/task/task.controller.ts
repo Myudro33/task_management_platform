@@ -8,13 +8,13 @@ import {
   Put,
   Req,
   UseInterceptors,
-  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadService } from 'src/file-upload/file-upload.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -26,9 +26,12 @@ import {
 } from '@nestjs/swagger';
 
 @Controller('/api/tasks')
-@ApiTags('Tasks') // Group in Swagger UI
+@ApiTags('Tasks')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   @Get(':id/files')
   @ApiBearerAuth()
@@ -41,12 +44,6 @@ export class TaskController {
 
   @Post(':id/files')
   @ApiBearerAuth()
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      new UploadService().getMulterOptions('files', 'file'),
-    ),
-  )
   @ApiOperation({ summary: 'Upload a file to a task' })
   @ApiParam({ name: 'id', type: Number })
   @ApiConsumes('multipart/form-data')
@@ -62,12 +59,22 @@ export class TaskController {
     },
   })
   @ApiResponse({ status: 201, description: 'File uploaded successfully' })
-  async uploadFile(
+  @UseInterceptors(
+    FilesInterceptor(
+      'file',
+      5,
+      new FileUploadService().getMulterOptions('files'),
+    ),
+  )
+  async UploadMultiple(
     @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @Req() req: any,
   ) {
-    return this.taskService.uploadFile(+id, file, req.user.id);
+    const validFiles = files.filter(() =>
+      this.fileUploadService.getMulterOptions('files'),
+    );
+    return this.taskService.uploadFile(+id, validFiles, req.user.id);
   }
 
   @Post()

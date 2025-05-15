@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UploadService } from 'src/file-upload/file-upload.service';
+import { ImageUploadService } from 'src/file-upload/file-upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
@@ -25,10 +25,7 @@ import {
 @ApiTags('Users')
 @ApiBearerAuth()
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly uploadService: UploadService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
@@ -49,7 +46,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor(
       'avatar',
-      new UploadService().getMulterOptions('avatars', 'image'),
+      new ImageUploadService().getMulterOptions('avatars'),
     ),
   )
   @ApiOperation({ summary: 'Update user profile and avatar' })

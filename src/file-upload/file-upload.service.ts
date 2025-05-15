@@ -3,8 +3,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 @Injectable()
-export class UploadService {
-  getMulterOptions(folder: string, type: 'image' | 'file') {
+export class ImageUploadService {
+  getMulterOptions(folder: string) {
     return {
       storage: diskStorage({
         destination: `./uploads/${folder}`,
@@ -15,14 +15,34 @@ export class UploadService {
       }),
       limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
       fileFilter: (_req: any, file: Express.Multer.File, cb: any) => {
-        if (type === 'image') {
-          if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
-            return cb(new Error('Only image files are allowed!'), false);
-          }
-        } else if (type === 'file') {
-          if (!file.mimetype.match(/\/(pdf|doc|docx|txt)$/)) {
-            return cb(new Error('Only document files are allowed!'), false);
-          }
+        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+    };
+  }
+
+  getPublicUrl(filename: string, folder: string): string {
+    return `/uploads/${folder}/${filename}`;
+  }
+}
+
+@Injectable()
+export class FileUploadService {
+  getMulterOptions(folder: string) {
+    return {
+      storage: diskStorage({
+        destination: `./uploads/${folder}`,
+        filename: (req, file, callback) => {
+          const uniqueName = `${Date.now()}${extname(file.originalname)}`;
+          callback(null, uniqueName);
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+      fileFilter: (_req: any, file: Express.Multer.File, cb: any) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|bmp|pdf)$/)) {
+          return cb(new Error('Only files are allowed!'), false);
         }
         cb(null, true);
       },

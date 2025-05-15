@@ -1,13 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UploadService } from 'src/file-upload/file-upload.service';
+import { ImageUploadService } from 'src/file-upload/file-upload.service';
 import { AppError } from 'src/app-error/app-error.module';
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly uploadService: UploadService,
+    private readonly uploadService: ImageUploadService,
   ) {}
 
   async getUsers() {
@@ -46,7 +46,7 @@ export class UserService {
       if (!user) {
         throw new AppError('User not found', HttpStatus.NOT_FOUND);
       }
-      let avatarUrl: string | undefined;
+      let avatarUrl: string;
       if (avatar) {
         avatarUrl = this.uploadService.getPublicUrl(avatar.filename, 'avatars');
         data.avatar = avatarUrl;
