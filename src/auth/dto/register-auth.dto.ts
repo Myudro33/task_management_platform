@@ -25,8 +25,8 @@ export class CreateAuthDto {
   @IsOptional()
   @IsNumber()
   roleId: number;
-  @ApiProperty({ example: 'UI/UX' })
+  @ApiProperty({ example: 1 })
   @IsOptional()
-  @IsString()
-  department: string;
+  @IsNumber()
+  departmentId: number;
 }

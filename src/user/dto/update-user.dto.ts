@@ -12,10 +12,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsNumber()
   roleId: number;
-  @ApiProperty({ example: 'IT' })
+  @ApiProperty({ example: 1 })
   @IsOptional()
-  @IsString()
-  department: string;
+  @IsNumber()
+  departmentId: number;
   @ApiProperty({ example: 'image' })
   @IsOptional()
   @IsString()

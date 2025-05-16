@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model departments {
+  id    Int     @id @unique @default(autoincrement())
+  name  String  @db.VarChar(255)
+  users users[]
+}
+
 model statuses {
   id    Int     @id @unique @default(autoincrement())
   name  String  @db.VarChar(255)
@@ -20,7 +26,7 @@ model files {
   filename   String @db.VarChar(255)
   url        String @db.VarChar(255)
   uploadedBy Int
-  author   users  @relation(fields: [uploadedBy], references: [id])
+  author     users  @relation(fields: [uploadedBy], references: [id])
 }
 
 model comments {
@@ -55,16 +61,17 @@ model roles {
 }
 
 model users {
-  id           Int        @id @unique @default(autoincrement())
-  name         String?    @db.VarChar(255)
-  email        String     @unique @db.VarChar(255)
-  password     String     @db.VarChar(255)
+  id           Int         @id @unique @default(autoincrement())
+  name         String?     @db.VarChar(255)
+  email        String      @unique @db.VarChar(255)
+  password     String      @db.VarChar(255)
   roleId       Int
-  roles        roles      @relation(fields: [roleId], references: [id])
-  department   String?    @db.VarChar(255)
-  avatar       String?    @db.VarChar(255)
-  tasksAsignee tasks[]    @relation("TasksAsignee")
-  tasksCreator tasks[]    @relation("TasksCreator")
+  roles        roles       @relation(fields: [roleId], references: [id])
+  avatar       String?     @db.VarChar(255)
+  departmentId Int
+  departments  departments @relation(fields: [departmentId], references: [id])
+  tasksAsignee tasks[]     @relation("TasksAsignee")
+  tasksCreator tasks[]     @relation("TasksCreator")
   files        files[]
   comments     comments[]
 }

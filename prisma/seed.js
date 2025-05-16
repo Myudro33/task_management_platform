@@ -4,6 +4,15 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Seed roles
+  const departments = await prisma.departments.createMany({
+    data: [
+      { id: 1, name: 'HR' },
+      { id: 2, name: 'IT' },
+      { id: 3, name: 'Finance' },
+      { id: 4, name: 'Marketing' },
+      { id: 5, name: 'Design' },
+    ],
+  });
   const statuses = await prisma.statuses.createMany({
     data: [
       { id: 1, name: 'pending' },
@@ -22,9 +31,10 @@ async function main() {
       {
         id: 1,
         name: 'nika',
-        email: 'nika@gmail.com',
+        email: 'qanashvilinika7@gmail.com',
         password: bcrypt.hashSync('nika123', 10),
         roleId: 1,
+        departmentId: 1,
       },
       {
         id: 2,
@@ -32,6 +42,7 @@ async function main() {
         email: 'saba@gmail.com',
         password: bcrypt.hashSync('nika123', 10),
         roleId: 2,
+        departmentId: 2,
       },
     ],
   });

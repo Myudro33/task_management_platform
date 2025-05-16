@@ -12,7 +12,9 @@ export class UserService {
 
   async getUsers() {
     try {
-      const users = await this.prisma.users.findMany();
+      const users = await this.prisma.users.findMany({
+        include: { roles: true, departments: true },
+      });
       if (!users) {
         throw new AppError('No users found', HttpStatus.NOT_FOUND);
       }
